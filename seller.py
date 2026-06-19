@@ -12,7 +12,25 @@ logger = logging.getLogger(__file__)
 
 
 def get_product_list(last_id, client_id, seller_token):
-    """Получить список товаров магазина озон"""
+    """Получить список товаров магазина озон.
+
+    Args:
+        last_id (str): id последнего товара для пагинации.
+        client_id (str): ID продавца.
+        seller_token (str): Токен авторизации магазина на Ozon.
+
+    Returns:
+        dict: Словарь со списком товаров,total и last_id.
+
+    Examples:
+        >>> get_product_list("", "client_123", "token_abc")
+        {'items': [{'product_id': 111, 'offer_id': 'art-001'}], 'last_id': 'bWFya2V0', 'total': 1}
+
+        >>> get_product_list("", "client_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     url = "https://api-seller.ozon.ru/v2/product/list"
     headers = {
         "Client-Id": client_id,
@@ -32,7 +50,24 @@ def get_product_list(last_id, client_id, seller_token):
 
 
 def get_offer_ids(client_id, seller_token):
-    """Получить артикулы товаров магазина озон"""
+    """Получить артикулы товаров магазина озон.
+
+    Args:
+     client_id (str): ID продавца.
+     seller_token (str): Токен авторизации магазина озон.
+
+    Returns:
+    list: Список артикулов товаров.
+
+    Examples:
+        >>> get_offer_ids("client_123", "token_abc")
+        ['art-001', 'art-002', 'art-003']
+
+        >>> get_offer_ids("client_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     last_id = ""
     product_list = []
     while True:
@@ -49,7 +84,27 @@ def get_offer_ids(client_id, seller_token):
 
 
 def update_price(prices: list, client_id, seller_token):
-    """Обновить цены товаров"""
+    """Обновить цены товаров.
+
+    Args:
+        prices (list): Список словарей с новыми ценами на товар.
+        client_id (str): ID продавца.
+        seller_token (str): Токен авторизации магазина на озон.
+
+    Returns:
+        dict: Словарь с результатом операции.
+
+    Examples:
+        >>> test_prices = [{'auto_action_enabled': 'UNKNOWN', 'currency_code': 'RUB', 'offer_id': '101', 'old_price': '0', 'price': '3500'}]
+        >>> update_price(test_prices, "client_123", "token_abc")
+        {'result': [{'offer_id': 'art-101', 'updated': True}]}
+
+        >>> test_prices = [{'auto_action_enabled': 'UNKNOWN', 'currency_code': 'RUB', 'offer_id': '101', 'old_price': '0', 'price': '3500'}]
+        >>> update_price(test_prices, "client_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     url = "https://api-seller.ozon.ru/v1/product/import/prices"
     headers = {
         "Client-Id": client_id,
@@ -62,7 +117,24 @@ def update_price(prices: list, client_id, seller_token):
 
 
 def update_stocks(stocks: list, client_id, seller_token):
-    """Обновить остатки"""
+    """Обновить остатки.
+    Args:
+        stocks (list): Список словарей с остатками товара.
+        client_id (str): ID продавца.
+        seller_token (str): Токен авторизации магазина на озон.
+
+    Returns:
+        dict: Словарь с результатом операции.
+
+    Examples:
+        >>> update_stocks([{'offer_id': 'art-001', 'stock': 10}], "client_123", "token_abc")
+        {'result': [{'offer_id': 'art-001', 'updated': True}]}
+
+        >>> update_stocks([{'offer_id': 'art-001', 'stock': 10}], "client_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     url = "https://api-seller.ozon.ru/v1/product/import/stocks"
     headers = {
         "Client-Id": client_id,
@@ -75,7 +147,20 @@ def update_stocks(stocks: list, client_id, seller_token):
 
 
 def download_stock():
-    """Скачать файл ostatki с сайта casio"""
+    """Скачать файл ostatki с сайта casio.
+
+    Returns:
+        list: Список словарей с остатками товара.
+
+    Examples:
+        >>> download_stock()
+        [{'Код': '101', 'Количество': '5', 'Цена': "3'500"}, {'Код': '102', 'Количество': '7', 'Цена': "4'200"}]
+
+        >>> download_stock()
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     # Скачать остатки с сайта
     casio_url = "https://timeworld.ru/upload/files/ostatki.zip"
     session = requests.Session()
@@ -96,6 +181,24 @@ def download_stock():
 
 
 def create_stocks(watch_remnants, offer_ids):
+    """Собрать данные об остатках товара в магазине озон.
+
+    Args:
+        watch_remnants (list): Список остатков товара в магазине поставщике.
+        offer_ids (list): Список артикулов товара в магазине озон.
+
+    Returns:
+        list: Список словарей с остатками товара в магазине озон.
+
+    Examples:
+        >>> create_stocks(([{'Код': '101', 'Количество': '5', 'Цена': "3'500"}], ['101']))
+        [{'offer_id': 'art-001', 'stock': 10}, {'offer_id': 'art-002', 'stock': 12}]
+
+        >>> create_stocks(([{'Код': '101', 'Количество': '5', 'Цена': "3'500"}], ['101']))
+        Traceback (most recent call last):
+        ValueError: invalid literal for int() with base 10: ...
+    """
+
     # Уберем то, что не загружено в seller
     stocks = []
     for watch in watch_remnants:
@@ -116,6 +219,25 @@ def create_stocks(watch_remnants, offer_ids):
 
 
 def create_prices(watch_remnants, offer_ids):
+    """Создать цены товарам магазина озон из цен остатков поставщика.
+
+    Args:
+        watch_remnants (list): Список остатков товара в магазине поставщике.
+        offer_ids (list): Список артикулов товара в магазине озон.
+
+    Returns:
+        list: Список словарей с ценами товаров в магазине озон.
+
+    Examples:
+
+        >>> create_prices([{'Код': '101', 'Количество': '5', 'Цена': "3'500"}], ['101'])
+        [{'auto_action_enabled': 'UNKNOWN', 'currency_code': 'RUB', 'offer_id': '101', 'old_price': '0', 'price': '3500'}]
+
+        >>> create_prices([{'Код': '101', 'Количество': '5', 'Цена': "3'500"}], ['101'])
+        Traceback (most recent call last):
+        AttributeError: 'int' object has no attribute 'split'
+    """
+
     prices = []
     for watch in watch_remnants:
         if str(watch.get("Код")) in offer_ids:
@@ -131,17 +253,71 @@ def create_prices(watch_remnants, offer_ids):
 
 
 def price_conversion(price: str) -> str:
-    """Преобразовать цену. Пример: 5'990.00 руб. -> 5990"""
+    """Преобразовать цену. Пример: 5'990.00 руб. -> 5990
+
+    Args:
+        price (str): Строка с ценой, например "5'990.00 руб.".
+
+    Returns:
+        str: Строка только из цифр целой части цены, например "5990".
+
+    Examples:
+        >>> price_conversion("5'990.00")
+        '5990'
+
+        >>> price_conversion(5990)
+        Traceback (most recent call last):
+        AttributeError: 'int' object has no attribute 'split'
+    """
+
     return re.sub("[^0-9]", "", price.split(".")[0])
 
 
 def divide(lst: list, n: int):
-    """Разделить список lst на части по n элементов"""
+    """Разделить список lst на части по n элементов.
+
+    Args:
+        lst (list): Список для разделения.
+        n (int): Количество элементов.
+
+    Returns:
+        generator: Генератор, возвращающий части исходного списка.
+
+    Examples:
+        >>> divide([1, 2, 3, 4, 5], 2))
+        [[1, 2], [3, 4], [5]]
+
+        >>> divide([1, 2], 0))
+        Traceback (most recent call last):
+        ValueError: range() arg 3 must not be zero
+    """
+
     for i in range(0, len(lst), n):
-        yield lst[i : i + n]
+        yield lst[i: i + n]
 
 
 async def upload_prices(watch_remnants, client_id, seller_token):
+    """Выгрузить обновленные цены товаров в магазин озон.
+
+    Args:
+        watch_remnants (list): Остатки товаров на сайте поставщика.
+        client_id (str): ID продавца.
+        seller_token (str): Токен авторизации магазина на озон.
+
+    Returns:
+        list: Список обновленных цен.
+
+    Examples:
+        >>> test_remnants = [{'Код': '102', 'Количество': '7', 'Цена': "4'200"}]
+        >>> await upload_prices(test_remnants, "client_123", "token_abc")
+        [{'auto_action_enabled': 'UNKNOWN', 'currency_code': 'RUB', 'offer_id': '101', 'old_price': '0', 'price': '4200'}]
+
+        >>> test_remnants = [{'Код': '102', 'Количество': '7', 'Цена': "4'200"}]
+        >>> await upload_prices(test_remnants, "client_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     offer_ids = get_offer_ids(client_id, seller_token)
     prices = create_prices(watch_remnants, offer_ids)
     for some_price in list(divide(prices, 1000)):
@@ -150,6 +326,27 @@ async def upload_prices(watch_remnants, client_id, seller_token):
 
 
 async def upload_stocks(watch_remnants, client_id, seller_token):
+    """Выгрузить обновленные остатки товаров в магазин озон.
+
+    Args:
+        watch_remnants (list): Остатки товаров на сайте поставщика.
+        client_id (str): ID продавца.
+        seller_token (str): Токен авторизации магазина на озон.
+
+    Returns:
+        tuple: Кортеж обновленных остатков.
+
+    Examples:
+        >>> test_remnants = [{'Код': '101', 'Количество': '5'}]
+        >>> await upload_stocks(test_remnants, "client_123", "token_abc")
+        ([{'offer_id': '101', 'stock': 5}], [{'offer_id': '101', 'stock': 5}])
+
+        >>> test_remnants = [{'Код': '101', 'Количество': '5'}]
+        >>> await upload_stocks(test_remnants, "client_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     offer_ids = get_offer_ids(client_id, seller_token)
     stocks = create_stocks(watch_remnants, offer_ids)
     for some_stock in list(divide(stocks, 100)):
