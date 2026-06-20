@@ -11,7 +11,7 @@ logger = logging.getLogger(__file__)
 
 
 def get_product_list(page, campaign_id, access_token):
-    """Получить список товаров Яндекс маркета.
+    """Получить список товаров Яндекс Маркета.
     Args:
         page (str): id страницы для пагинации.
         campaign_id (str): ID компании.
