@@ -192,10 +192,10 @@ def create_stocks(watch_remnants, offer_ids):
         list: Список словарей с остатками товара в магазине озон.
 
     Examples:
-        >>> create_stocks(([{'Код': '101', 'Количество': '5', 'Цена': "3'500"}], ['101']))
+        >>> create_stocks(([{'Код': '101', 'Количество': '5'}], ['101']))
         [{'offer_id': 'art-001', 'stock': 10}, {'offer_id': 'art-002', 'stock': 12}]
 
-        >>> create_stocks(([{'Код': '101', 'Количество': '5', 'Цена': "3'500"}], ['101']))
+        >>> create_stocks(([{'Код': '101', 'Количество': '5'}], ['101']))
         Traceback (most recent call last):
         ValueError: invalid literal for int() with base 10: ...
     """
@@ -231,10 +231,10 @@ def create_prices(watch_remnants, offer_ids):
 
     Examples:
 
-        >>> create_prices([{'Код': '101', 'Количество': '5', 'Цена': "3'500"}], ['101'])
+        >>> create_prices([{'Код': '101', 'Цена': "3'500"}], ['101'])
         [{'auto_action_enabled': 'UNKNOWN', 'currency_code': 'RUB', 'offer_id': '101', 'old_price': '0', 'price': '3500'}]
 
-        >>> create_prices([{'Код': '101', 'Количество': '5', 'Цена': "3'500"}], ['101'])
+        >>> create_prices([{'Код': '101', 'Цена': "3'500"}], ['101'])
         Traceback (most recent call last):
         AttributeError: 'int' object has no attribute 'split'
     """
@@ -309,11 +309,11 @@ async def upload_prices(watch_remnants, client_id, seller_token):
         list: Список обновленных цен.
 
     Examples:
-        >>> test_remnants = [{'Код': '102', 'Количество': '7', 'Цена': "4'200"}]
+        >>> test_remnants = [{'Код': '102', 'Цена': "4'200"}]
         >>> await upload_prices(test_remnants, "client_123", "token_abc")
         [{'auto_action_enabled': 'UNKNOWN', 'currency_code': 'RUB', 'offer_id': '101', 'old_price': '0', 'price': '4200'}]
 
-        >>> test_remnants = [{'Код': '102', 'Количество': '7', 'Цена': "4'200"}]
+        >>> test_remnants = [{'Код': '102', 'Цена': "4'200"}]
         >>> await upload_prices(test_remnants, "client_123", "token_abc")
         Traceback (most recent call last):
         requests.exceptions.ConnectionError: ...
