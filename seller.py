@@ -53,11 +53,11 @@ def get_offer_ids(client_id, seller_token):
     """Получить артикулы товаров магазина озон.
 
     Args:
-     client_id (str): ID продавца.
-     seller_token (str): Токен авторизации магазина озон.
+        client_id (str): ID продавца.
+        seller_token (str): Токен авторизации магазина озон.
 
     Returns:
-    list: Список артикулов товаров.
+        list: Список артикулов товаров.
 
     Examples:
         >>> get_offer_ids("client_123", "token_abc")
@@ -118,6 +118,7 @@ def update_price(prices: list, client_id, seller_token):
 
 def update_stocks(stocks: list, client_id, seller_token):
     """Обновить остатки.
+
     Args:
         stocks (list): Список словарей с остатками товара.
         client_id (str): ID продавца.
@@ -181,7 +182,7 @@ def download_stock():
 
 
 def create_stocks(watch_remnants, offer_ids):
-    """Собрать данные об остатках товара в магазине озон.
+    """Сформировать остатки товара в магазине озон.
 
     Args:
         watch_remnants (list): Список остатков товара в магазине поставщике.
