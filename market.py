@@ -11,6 +11,24 @@ logger = logging.getLogger(__file__)
 
 
 def get_product_list(page, campaign_id, access_token):
+    """Получить список товаров Яндекс маркета.
+    Args:
+        page (str): id страницы для пагинации.
+        campaign_id (str): ID компании.
+        access_token (str): Токен к API яндекса.
+
+    Returns:
+        dict: Словарь со списками товаров, nextPageToken.
+
+    Examples:
+        >>> get_product_list("", "campaign_123", "token_abc")
+        {'offerMappingEntries': [{'offer': {'shopSku': 'art-001'}}], 'paging': {'nextPageToken': 'page_2'}}
+
+        >>> get_product_list("", "campaign_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     endpoint_url = "https://api.partner.market.yandex.ru/"
     headers = {
         "Content-Type": "application/json",
@@ -30,6 +48,27 @@ def get_product_list(page, campaign_id, access_token):
 
 
 def update_stocks(stocks, campaign_id, access_token):
+    """Обновить остатки.
+
+    Args:
+        stocks (list): Список словарей с остатками товара.
+        campaign_id (str): ID компании.
+        access_token (str): Токен к API яндекса.
+
+    Returns:
+        dict: Словарь с результатом операции.
+
+    Examples:
+        >>> test_stocks = [{'sku': '101', 'warehouseId': 999, 'items': [{'count': 5, 'type': 'FIT', 'updatedAt': '2026-06-20T11:11:00Z'}]}]
+        >>> update_stocks(test_stocks, "id_123", "token_abc")
+        {'status': 'OK'}
+
+        >>> test_stocks = [{'sku': '101', 'warehouseId': 999, 'items': [{'count': 5, 'type': 'FIT', 'updatedAt': '2026-06-20T11:11:00Z'}]}]
+        >>> update_stocks(test_stocks, "id_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     endpoint_url = "https://api.partner.market.yandex.ru/"
     headers = {
         "Content-Type": "application/json",
@@ -46,6 +85,27 @@ def update_stocks(stocks, campaign_id, access_token):
 
 
 def update_price(prices, campaign_id, access_token):
+    """Обновить цены товаров.
+
+    Args:
+        prices (list): Список словарей с новыми ценами на товар.
+        campaign_id (str): ID компании.
+        access_token (str): Токен к API яндекса.
+
+    Returns:
+        dict: Словарь с результатом операции.
+
+    Examples:
+        >>> test_prices = [{'id': '101', 'price': {'value': 3500, 'currencyId': 'RUR'}}]
+        >>> update_price(test_prices, "id_123", "token_abc")
+        {'status': 'OK'}
+
+        >>> test_prices = [{'id': '101', 'price': {'value': 3500, 'currencyId': 'RUR'}}]
+        >>> update_price(test_prices, "id_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     endpoint_url = "https://api.partner.market.yandex.ru/"
     headers = {
         "Content-Type": "application/json",
@@ -62,7 +122,23 @@ def update_price(prices, campaign_id, access_token):
 
 
 def get_offer_ids(campaign_id, market_token):
-    """Получить артикулы товаров Яндекс маркета"""
+    """Получить артикулы товаров Яндекс маркета.
+    Args:
+        campaign_id (str): ID компании.
+        market_token (str): Токен авторизации магазина яндекс.
+
+    Returns:
+        list: Список артикулов товаров.
+
+    Examples:
+        >>> get_offer_ids("campaign_123", "token_abc")
+        ['art-001', 'art-002', 'art-003']
+
+        >>> get_offer_ids("campaign_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     page = ""
     product_list = []
     while True:
@@ -78,6 +154,27 @@ def get_offer_ids(campaign_id, market_token):
 
 
 def create_stocks(watch_remnants, offer_ids, warehouse_id):
+    """Сформировать остатки товара в магазине яндекс.
+
+    Args:
+        watch_remnants (list): Список остатков товара в магазине поставщике.
+        offer_ids (list): Список артикулов товара в магазине яндекс.
+        warehouse_id (int): Id склада.
+
+    Returns:
+        list: Список словарей с остатками товара в магазине яндекс.
+
+    Examples:
+        >>> test_remnants = [{'Код': '101', 'Количество': '5'}]
+        >>> create_stocks(test_remnants, ['101'], 999)
+        [{'sku': '101', 'warehouseId': 999, 'items': [{'count': 5, 'type': 'FIT', 'updatedAt': '2026-06-20T11:11:00Z'}]}]
+
+        >>> test_remnants_error = [{'Код': '101', 'Количество': 'много'}]
+        >>> create_stocks(test_remnants_error, ['101'], 999)
+        Traceback (most recent call last):
+        ValueError: invalid literal for int() with base 10: ...
+    """
+
     # Уберем то, что не загружено в market
     stocks = list()
     date = str(datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z")
@@ -123,6 +220,26 @@ def create_stocks(watch_remnants, offer_ids, warehouse_id):
 
 
 def create_prices(watch_remnants, offer_ids):
+    """Создать цены товарам магазина яндекс из цен остатков поставщика.
+
+    Args:
+        watch_remnants (list): Список остатков товара в магазине поставщике.
+        offer_ids (list): Список артикулов товара в магазине яндекс.
+
+    Returns:
+        list: Список словарей с ценами товаров в магазине яндекс.
+
+    Examples:
+        >>> test_remnants = [{'Код': '101', 'Цена': "3'500"}]
+        >>> create_prices(test_remnants, ['101'])
+        [{'id': '101', 'price': {'value': 3500, 'currencyId': 'RUR'}}]
+
+        >>> test_remnants = [{'Код': '101', 'Цена': "3'500"}]
+        >>> create_prices(test_remnants, ['101'])
+        Traceback (most recent call last):
+        AttributeError: 'int' object has no attribute 'split'
+    """
+
     prices = []
     for watch in watch_remnants:
         if str(watch.get("Код")) in offer_ids:
@@ -143,6 +260,26 @@ def create_prices(watch_remnants, offer_ids):
 
 
 async def upload_prices(watch_remnants, campaign_id, market_token):
+    """Выгрузить обновленные цены товаров в магазин яндекс.
+
+    Args:
+        watch_remnants (list): Остатки товаров на сайте поставщика.
+        campaign_id (str): ID компании.
+        market_token (str): Токен авторизации магазина яндекс.
+
+    Returns:
+        list: Список обновленных цен.
+
+    Examples:
+        >>> test_remnants = [{'Код': '101', 'Цена': "3'500"}]
+        >>> await upload_prices(test_remnants, "id_123", "token_abc")
+        [{'id': '101', 'price': {'value': 3500, 'currencyId': 'RUR'}}]
+
+        >>> test_remnants = [{'Код': '101', 'Цена': "3'500"}]
+        >>> await upload_prices(test_remnants, "id_123", "token_abc")
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
     offer_ids = get_offer_ids(campaign_id, market_token)
     prices = create_prices(watch_remnants, offer_ids)
     for some_prices in list(divide(prices, 500)):
@@ -151,6 +288,29 @@ async def upload_prices(watch_remnants, campaign_id, market_token):
 
 
 async def upload_stocks(watch_remnants, campaign_id, market_token, warehouse_id):
+    """Выгрузить обновленные остатки товаров в магазин яндекс.
+
+    Args:
+        watch_remnants (list): Остатки товаров на сайте поставщика.
+        campaign_id (str): ID компании.
+        market_token (str): Токен авторизации магазина яндекс.
+        warehouse_id (int): ID склада.
+
+    Returns:
+        tuple: Кортеж обновленных остатков.
+
+    Examples:
+        >>> test_remnants = [{'Код': '101', 'Количество': '5'}]
+        >>> await upload_stocks(test_remnants, "id_123", "token_abc", 999)
+        ([{'sku': '101', 'warehouseId': 999, 'items': [{'count': 5, 'type': 'FIT', 'updatedAt': '2026-06-20T11:11:00Z'}]}],
+        [{'sku': '101', 'warehouseId': 999, 'items': [{'count': 5, 'type': 'FIT', 'updatedAt': '2026-06-20T11:11:00Z'}]}])
+
+        >>> test_remnants = [{'Код': '101', 'Количество': '5'}]
+        >>> await upload_stocks(test_remnants, "id_123", "token_abc", 999)
+        Traceback (most recent call last):
+        requests.exceptions.ConnectionError: ...
+    """
+
     offer_ids = get_offer_ids(campaign_id, market_token)
     stocks = create_stocks(watch_remnants, offer_ids, warehouse_id)
     for some_stock in list(divide(stocks, 2000)):
