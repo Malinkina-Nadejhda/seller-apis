@@ -18,7 +18,7 @@ def get_product_list(page, campaign_id, access_token):
         access_token (str): Токен к API яндекса.
 
     Returns:
-        dict: Словарь со списками товаров, nextPageToken.
+        dict: Словарь со списками товаров, токен следующей страницы для пагинации.
 
     Examples:
         >>> get_product_list("", "campaign_123", "token_abc")
