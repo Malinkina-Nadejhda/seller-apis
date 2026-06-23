@@ -20,7 +20,7 @@ def get_product_list(last_id, client_id, seller_token):
         seller_token (str): Токен авторизации магазина на Ozon.
 
     Returns:
-        dict: Словарь со списком товаров,total и last_id.
+        dict: Словарь со списком товаров, общее кол-во товаров и id последнего товара для пагинации.
 
     Examples:
         >>> get_product_list("", "client_123", "token_abc")
